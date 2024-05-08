@@ -1,0 +1,537 @@
+package com.example.labtestpractice;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
+public class MainActivity extends AppCompatActivity {
+
+    private TextView tvShapeInfo;
+    private TextView tvColorInfo;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        tvShapeInfo = findViewById(R.id.tvShapeInfo);
+        tvColorInfo = findViewById(R.id.tvColorInfo);
+
+        // Shape buttons
+        setupShapeButton(R.id.btnCreateCircle, new Circle("Circle", 5.0));
+        setupShapeButton(R.id.btnCreateSquare, new Square("Square", 4.0));
+        setupShapeButton(R.id.btnCreateTriangle, new Triangle("Triangle", 3.0, 4.0, 5.0));
+
+        // Color buttons
+        setupColorButton(R.id.btnRed, new Red());
+        setupColorButton(R.id.btnBlue, new Blue());
+        setupColorButton(R.id.btnGreen, new Green());
+
+        Button btnNewAct = findViewById(R.id.buttonNewAct);
+        btnNewAct.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, MainActivity2.class);
+                startActivity(intent);
+            }
+        });
+    }
+
+    private void setupShapeButton(int buttonId, Shape shape) {
+        Button button = findViewById(buttonId);
+        button.setOnClickListener(v -> displayShapeInfo(shape));
+    }
+
+    private void setupColorButton(int buttonId, Color color) {
+        Button button = findViewById(buttonId);
+        button.setOnClickListener(v -> displayColorInfo(color));
+    }
+
+    private void displayShapeInfo(Shape shape) {
+        String info = "Shape: " + shape.name;
+        tvShapeInfo.setText(info);
+    }
+
+    private void displayColorInfo(Color color) {
+        String info = "Selected Color: " + color.name;
+        tvColorInfo.setText(info);
+    }
+}
+
+
+
+public abstract class Shape {
+    protected String name;
+
+    public Shape(String name) {
+        this.name = name;
+    }
+
+    public abstract double area();
+    public abstract double perimeter();
+}
+
+
+
+public class Square extends Shape {
+    private double sideLength;
+
+    public Square(String name, double sideLength) {
+        super(name);
+        this.sideLength = sideLength;
+    }
+
+    @Override
+    public double area() {
+        return sideLength * sideLength;
+    }
+
+    @Override
+    public double perimeter() {
+        return 4 * sideLength;
+    }
+}
+
+public class Color {
+    protected String name;
+
+    public Color(String name) {
+        this.name = name;
+    }
+
+    public void showColor() {
+        System.out.println("The color is: " + name);
+    }
+}
+
+class Red extends Color {
+    public Red() {
+        super("Red");
+    }
+}
+
+class Blue extends Color {
+    public Blue() {
+        super("Blue");
+    }
+}
+
+class Green extends Color {
+    public Green() {
+        super("Green");
+    }
+}
+
+
+
+public class CircleTest {
+
+    @Test
+    public void testArea() {
+        Circle circle = new Circle("Circle", 5.0);
+        double expected = Math.PI * 5.0 * 5.0;
+        assertEquals("The area of the circle is incorrect", expected, circle.area(), 0.001);
+    }
+
+    @Test
+    public void testPerimeter() {
+        Circle circle = new Circle("Circle", 5.0);
+        double expected = 2 * Math.PI * 5.0;
+        assertEquals("The perimeter of the circle is incorrect", expected, circle.perimeter(), 0.001);
+    }
+
+}
+
+
+
+
+public class MainActivityTest {
+    @Rule
+    public ActivityScenarioRule<MainActivity> activityTestRule = new ActivityScenarioRule<>(MainActivity.class);
+
+    @Test
+    public void testButtonClickSquare() {
+        Espresso.onView(withId(R.id.btnCreateSquare)).perform(click());
+        Espresso.onView(ViewMatchers.withId(R.id.tvShapeInfo))
+                .check(ViewAssertions.matches(ViewMatchers.withText("Shape: Square")));
+        }
+@Test
+    public void testButtonClickCircle() {
+    Espresso.onView(withId(R.id.btnCreateCircle)).perform(click());
+    Espresso.onView(ViewMatchers.withId(R.id.tvShapeInfo))
+            .check(ViewAssertions.matches(ViewMatchers.withText("Shape: Circle")));
+}
+@Test
+    public void testButtonClickTriangle() {
+    Espresso.onView(withId(R.id.btnCreateTriangle)).perform(click());
+    Espresso.onView(ViewMatchers.withId(R.id.tvShapeInfo))
+            .check(ViewAssertions.matches(ViewMatchers.withText("Shape: Triangle")));
+
+    }
+@Test
+    public void testNewActivityButton(){
+    Espresso.onView(withId(R.id.buttonNewAct)).perform(click());
+    assertNotNull(ActivityScenario.launch(MainActivity2.class));
+}
+
+
+}
+
+
+
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:text="Create Shapes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:textStyle="bold"/>
+
+    <Button
+        android:id="@+id/btnCreateCircle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Create Circle"/>
+
+    <Button
+        android:id="@+id/btnCreateSquare"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Create Square"/>
+
+    <Button
+        android:id="@+id/btnCreateTriangle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Create Triangle"/>
+
+    <TextView
+        android:id="@+id/tvShapeInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"/>
+
+    <TextView
+
+        android:text="Choose Colors"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:textStyle="bold"/>
+
+    <Button
+        android:id="@+id/btnRed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Red"/>
+
+    <Button
+        android:id="@+id/btnBlue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Blue"/>
+
+    <Button
+        android:id="@+id/btnGreen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Green"/>
+
+    <TextView
+        android:id="@+id/tvColorInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"/>
+
+    <Button
+        android:id="@+id/buttonNewAct"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Go" />
+
+</LinearLayout>
+name: AndroidBuild
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.0
+      - name: Setup Java JDK
+        uses: actions/setup-java@v3.13.0
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+      - name: Grant execute permission to gradlew
+        run: chmod +x ./gradlew
+      - name: Build with Gradle
+        run: ./gradlew build
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v3.1.3
+        with:
+          name: ghumashee.apk
+          path: app/build/outputs/apk/debug/app-debug.apk
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+public class Bank {
+    private String name;
+    private float currentBalance;
+    private float previousBalance;
+
+    public Bank(String name, float initialBalance) {
+        this.name = name;
+        this.currentBalance = initialBalance;
+        this.previousBalance = initialBalance; // Initially, the previous balance is the same as the current.
+    }
+
+    public float balance() {
+        return currentBalance;
+    }
+
+    public float prevBalance() {
+        return previousBalance;
+    }
+
+    protected void updateBalances(float newBalance) {
+        this.previousBalance = this.currentBalance;
+        this.currentBalance = newBalance;
+    }
+}
+2. Implement Subclasses of Bank
+Withdraw Class
+java
+Copy code
+public class Withdraw extends Bank {
+    private float amount;
+
+    public Withdraw(String name, float initialBalance, float amount) {
+        super(name, initialBalance);
+        this.amount = amount;
+    }
+
+    @Override
+    public float balance() {
+        updateBalances(super.balance() - amount);
+        return super.balance();
+    }
+
+    @Override
+    public float prevBalance() {
+        return super.prevBalance();
+    }
+}
+Save Class
+java
+Copy code
+public class Save extends Bank {
+    private float money;
+
+    public Save(String name, float initialBalance, float money) {
+        super(name, initialBalance);
+        this.money = money;
+    }
+
+    @Override
+    public float balance() {
+        updateBalances(super.balance() + money);
+        return super.balance();
+    }
+
+    @Override
+    public float prevBalance() {
+        return super.prevBalance();
+    }
+}
+3. Define the Calc Class
+java
+Copy code
+public class Calc {
+    private int money;
+
+    public Calc(int money) {
+        this.money = money;
+    }
+
+    public int calcu() {
+        return money; // Simple placeholder for the calculation logic.
+    }
+}
+4. Implement Subclasses of Calc (Assuming the use cases require specific calculations)
+This part is a bit unclear based on your question. Typically, subclasses would be used for different types of calculations, such as interest calculation, tax deductions, etc.
+
+5. Create Instances for Testing
+java
+Copy code
+public class Main {
+    public static void main(String[] args) {
+        Bank johnsAccount = new Save("John Doe", 1000, 500);
+        System.out.println("New balance after saving: " + johnsAccount.balance());
+        System.out.println("Previous balance was: " + johnsAccount.prevBalance());
+
+        Bank janeAccount = new Withdraw("Jane Doe", 1500, 300);
+        System.out.println("New balance after withdrawal: " + janeAccount.balance());
+        System.out.println("Previous balance was: " + janeAccount.prevBalance());
+    }
+}
+6. Develop Unit Tests
+You can use JUnit for this purpose in IntelliJ. Here's how you can create a simple unit test for the Save class:
+
+java
+Copy code
+import static org.junit.Assert.*;
+import org.junit.Test;
+
+public class SaveTest {
+    @Test
+    public void testBalance() {
+        Save testAccount = new Save("Tester", 1000, 200);
+        assertEquals(1200, testAccount.balance(), 0.01);
+    }
+
+    @Test
+    public void testPrevBalance() {
+        Save testAccount = new Save("Tester", 1000, 200);
+        testAccount.balance();
+        assertEquals(1000, testAccount.prevBalance(), 0.01);
+    }
+}
+
+
+
+
+
+
+
+
+
+dependencies {
+    // Espresso dependencies
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    androidTestImplementation 'androidx.test:runner:1.4.0'
+    androidTestImplementation 'androidx.test:rules:1.4.0'
+}
+
+
+public class MainActivity extends AppCompatActivity {
+    private TextView balanceView;
+    private Bank userAccount;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        balanceView = findViewById(R.id.balance_view);
+
+        // Initialize user account with dummy data
+        userAccount = new Save("John Doe", 1000, 200);
+        updateBalanceDisplay();
+    }
+
+    private void updateBalanceDisplay() {
+        balanceView.setText(String.format("Balance: $%.2f", userAccount.balance()));
+    }
+
+    // Dummy function to simulate user interaction
+    public void onDepositClick(View view) {
+        ((Save) userAccount).balance(); // Simulate deposit
+        updateBalanceDisplay();
+    }
+
+    public void onWithdrawClick(View view) {
+        ((Withdraw) userAccount).balance(); // Simulate withdrawal
+        updateBalanceDisplay();
+    }
+}
+Write Espresso Tests
+Now, create Espresso tests to simulate user interactions and validate the UI:
+
+java
+Copy code
+// MainActivityTest.java
+@RunWith(AndroidJUnit4.class)
+public class MainActivityTest {
+    @Rule
+    public ActivityScenarioRule<MainActivity> activityRule =
+        new ActivityScenarioRule<>(MainActivity.class);
+
+    @Test
+    public void testDepositUpdatesBalance() {
+        // Click on deposit button
+        onView(withId(R.id.deposit_button)).perform(click());
+
+        // Check if the balance is updated correctly
+        onView(withId(R.id.balance_view)).check(matches(withText("Balance: $1200.00")));
+    }
+
+    @Test
+    public void testWithdrawalUpdatesBalance() {
+        // Click on withdrawal button
+        onView(withId(R.id.withdraw_button)).perform(click());
+
+        // Check if the balance is updated correctly
+        onView(withId(R.id.balance_view)).check(matches(withText("Balance: $800.00")));
+    }
+}
+Implement Continuous Integration Using GitHub Actions
+Create a .github/workflows/android-ci.yml file in your repository to set up the CI pipeline:
+
+yaml
+Copy code
+name: Android CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up JDK 11
+      uses: actions/setup-java@v2
+      with:
+        java-version: '11'
+        distribution: 'adopt'
+    - name: Grant execute permission for gradlew
+      run: chmod +x ./gradlew
+    - name: Build Debug APK
+      run: ./gradlew assembleDebug
+    - name: Run Unit Tests
+      run: ./gradlew test
+    - name: Run Android Tests
+      run: ./gradlew connectedAndroidTest
